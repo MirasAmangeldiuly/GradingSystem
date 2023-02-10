@@ -1,0 +1,92 @@
+import java.util.ArrayList;
+import java.util.HashMap;
+
+public class EvaluationSystem {
+    private ArrayList<Student> students;
+    private ArrayList<Course> courses;
+
+    public EvaluationSystem() {
+        this.students = new ArrayList<>();
+        this.courses = new ArrayList<>();
+    }
+
+
+    public void addStudent(Student student) {
+        students.add(student);
+    }
+
+    public void addCourse(Course course) {
+        courses.add(course);
+    }
+
+    public Student getStudentById(int id) {
+        for (Student student : students) {
+            if (student.getId() == id) {
+                return student;
+            }
+        }
+        return null;
+    }
+
+    public Course getCourseById(int id) {
+        for (Course course : courses) {
+            if (course.getId() == id) {
+                return course;
+            }
+        }
+        return null;
+    }
+
+    public void enrollStudentInCourse(int studentId, int courseId) {
+        Student student = getStudentById(studentId);
+        Course course = getCourseById(courseId);
+        if (student != null && course != null) {
+            student.addCourse(course);
+        }
+    }
+
+    public void addEvaluationToCourse(int courseId, Evaluation evaluation) {
+        Course course = getCourseById(courseId);
+        if (course != null) {
+            course.addEvaluation(evaluation);
+        }
+    }
+
+    public double getStudentAverageScore(int studentId) {
+        Student student = getStudentById(studentId);
+        if (student == null) {
+            return 0;
+        }
+        ArrayList<Course> courses = student.getCourses();
+        double totalWeight = 0;
+        double weightedScoreSum = 0;
+        for (Course course : courses) {
+            totalWeight += 100;
+            weightedScoreSum += course.getCourseScore();
+        }
+        return weightedScoreSum / totalWeight * 100;
+    }
+
+    public HashMap<Course, ArrayList<Evaluation>> getStudentEvaluations(int studentId) {
+        Student student = getStudentById(studentId);
+        if (student == null) {
+            return null;
+        }
+
+        ArrayList<Course> courses = student.getCourses();
+        HashMap<Course, ArrayList<Evaluation>> evaluationsMap = new HashMap<>();
+        for (Course course : courses) {
+            evaluationsMap.put(course, course.getEvaluations());
+        }
+
+        return evaluationsMap;
+    }
+
+    @Override
+    public String toString() {
+        return "EvaluationSystem{" +
+                "students=" + students +
+                ", courses=" + courses +
+                '}';
+    }
+}
