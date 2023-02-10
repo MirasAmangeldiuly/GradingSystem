@@ -1,0 +1,53 @@
+import java.sql.*;
+import java.util.Scanner;
+
+public class StudentGrades {
+
+    static final String JDBC_DRIVER = "org.postgresql.Driver";
+    static final String DB_URL = "jdbc:postgresql://localhost:5432/GradedOne";
+
+    static final String USER = "postgres";
+    static final String PASS = "530122";
+
+    public static void main(String[] args) {
+        StudentGrades studentGrades = new StudentGrades();
+        studentGrades.getStudentGrade();
+    }
+
+    public void getStudentGrade() {
+        Connection conn = null;
+        try {
+            Class.forName(JDBC_DRIVER);
+            conn = DriverManager.getConnection(DB_URL, USER, PASS);
+        } catch (ClassNotFoundException | SQLException e) {
+            System.out.println("Error connecting to the database: " + e.getMessage());
+        }
+
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter student name: ");
+        String studentName = scanner.nextLine();
+        System.out.print("Enter course name: ");
+        String courseName = scanner.nextLine();
+        try {
+            PreparedStatement statement = conn.prepareStatement("SELECT grade FROM grades WHERE student_name = ? and course_name = ?");
+            statement.setString(1, studentName);
+            statement.setString(2, courseName);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                System.out.println("Grade: " + resultSet.getString("grade"));
+            } else {
+                System.out.println("No grade found for the given student and course.");
+            }
+        } catch (SQLException e) {
+            System.out.println("Error executing the query: " + e.getMessage());
+        } finally {
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                System.out.println("Error closing the connection: " + e.getMessage());
+            }
+        }
+    }
+}
