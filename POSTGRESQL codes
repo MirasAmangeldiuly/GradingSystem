@@ -1,0 +1,26 @@
+CREATE TABLE students (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  enroll_date DATE NOT NULL
+);
+
+CREATE TABLE courses (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE enrollments (
+  student_id INT REFERENCES students (id),
+  course_id INT REFERENCES courses (id),
+  midterm_score INT NOT NULL,
+  endterm_score INT NOT NULL,
+  PRIMARY KEY (student_id, course_id)
+);
+
+
+ALTER TABLE enrollments ADD COLUMN gpa FLOAT;
+ALTER TABLE enrollments ADD COLUMN homework_score INT NOT NULL;
+ALTER TABLE enrollments ADD COLUMN assignment_score INT NOT NULL;
+
+ALTER TABLE enrollments ALTER COLUMN gpa SET NOT NULL;
+delete from enrollments where student_id = 1;
