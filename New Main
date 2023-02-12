@@ -1,0 +1,73 @@
+import java.sql.*;
+import java.util.Scanner;
+
+public class Main3 extends Student{
+    public static void main(String[] args) throws SQLException {
+        Connection connection = Database.getConnection();
+        Scanner scanner = new Scanner(System.in);
+        Student student = new Student();
+        Course course = new Course();
+
+        System.out.print("Enter student name: ");
+        String studentName = scanner.nextLine();
+        System.out.print("Enter course name: ");
+        String courseName = scanner.nextLine();
+        System.out.print("Enter midterm score: ");
+        int midtermScore = scanner.nextInt();
+        System.out.print("Enter endterm score: ");
+        int endtermScore = scanner.nextInt();
+        System.out.print("Enter homeworks score: ");
+        int homeworksScore = scanner.nextInt();
+        System.out.print("Enter assignments score: ");
+        int assignmentsScore = scanner.nextInt();
+        scanner.close();
+
+        int totalScore = midtermScore + endtermScore + homeworksScore + assignmentsScore;
+        double gpa = totalScore / 100.0;
+
+        int studentId = student.getId();
+        int courseId = course.getId();
+
+        String insertQuery = "INSERT INTO enrollments (student_id, course_id, midterm_score, endterm_score, gpa, homework_score, assignment_score) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        PreparedStatement preparedStatement = connection.prepareStatement(insertQuery);
+        preparedStatement.setInt(1, studentId);
+        preparedStatement.setInt(2, courseId);
+        preparedStatement.setInt(3, midtermScore);
+        preparedStatement.setInt(4, endtermScore);
+        preparedStatement.setDouble(5, gpa);
+        preparedStatement.setInt(6, homeworksScore);
+        preparedStatement.setInt(7, assignmentsScore);
+        preparedStatement.executeUpdate();
+
+        System.out.println("Student information has been added to the database.");
+        System.out.println("Student name: " + studentName);
+        System.out.println("Course name: " + courseName);
+        System.out.println("Midterm score: " + midtermScore);
+        System.out.println("Endterm score: " + endtermScore);
+        System.out.println("GPA: " + gpa);
+        System.out.println("Homeworks score: " + homeworksScore);
+        System.out.println("Assignments score: " + assignmentsScore);
+    }
+
+//    private static int getStudentId(Connection connection, String studentName) throws SQLException {
+//        String query = "SELECT id FROM students WHERE name = ?";
+//        PreparedStatement preparedStatement = connection.prepareStatement(query);
+//        preparedStatement.setString(1, studentName);
+//        ResultSet resultSet = preparedStatement.executeQuery();
+//        if (resultSet.next()) {
+//            return resultSet.getInt("id");
+//        }
+//        return -1;
+//    }
+//    private static int getCourseId(Connection connection, String courseName) throws SQLException {
+//        String query = "SELECT id FROM courses WHERE name = ?";
+//        PreparedStatement preparedStatement = connection.prepareStatement(query);
+//        preparedStatement.setString(1, courseName);
+//        ResultSet resultSet = preparedStatement.executeQuery();
+//        if (resultSet.next()) {
+//            return resultSet.getInt("id");
+//        }
+//        return -1;
+//    }
+}
+
