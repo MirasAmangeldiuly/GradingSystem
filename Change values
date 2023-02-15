@@ -1,0 +1,116 @@
+import java.sql.*;
+import java.util.Scanner;
+
+public class ToChange extends Student {
+    public static void main(String[] args) throws SQLException {
+        Connection connection = Database.getConnection();
+        Scanner scanner = new Scanner(System.in);
+
+        // Get course name and course ID
+        System.out.print("Enter course name: ");
+        String courseName = scanner.nextLine();
+        int courseId = getCourseId(connection, courseName);
+
+        // Get student name and student ID
+        System.out.print("Enter student name: ");
+        String studentName = scanner.nextLine();
+        int studentId = getStudentId(connection, studentName);
+
+        // Loop for allowing user to update scores for the student
+        boolean keepUpdating = true;
+        while (keepUpdating) {
+            // Ask user what score to update
+            System.out.println("What score do you want to update?");
+            System.out.println("1. Homework");
+            System.out.println("2. Assignment");
+            System.out.println("3. Midterm");
+            System.out.println("4. Endterm");
+            int choice = scanner.nextInt();
+            scanner.nextLine(); // Consume newline character
+
+            // Update the score in the database
+            String updateQuery = "";
+            String columnToChange = "";
+            switch (choice) {
+                case 1:
+                    updateQuery = "UPDATE enrollments SET homework_score = ? WHERE student_id = ? AND course_id = ?";
+                    columnToChange = "homeworks";
+                    break;
+                case 2:
+                    updateQuery = "UPDATE enrollments SET assignment_score = ? WHERE student_id = ? AND course_id = ?";
+                    columnToChange = "assignments";
+                    break;
+                case 3:
+                    updateQuery = "UPDATE enrollments SET midterm_score = ? WHERE student_id = ? AND course_id = ?";
+                    columnToChange = "midterm";
+                    break;
+                case 4:
+                    updateQuery = "UPDATE enrollments SET endterm_score = ? WHERE student_id = ? AND course_id = ?";
+                    columnToChange = "endterm";
+                    break;
+                default:
+                    System.out.println("Invalid choice.");
+                    continue; // Start the loop again
+            }
+            System.out.print("Enter new " + columnToChange + " score: ");
+            int newScore = scanner.nextInt();
+            PreparedStatement updateStatement = connection.prepareStatement(updateQuery);
+            updateStatement.setInt(1, newScore);
+            updateStatement.setInt(2, studentId);
+            updateStatement.setInt(3, courseId);
+            updateStatement.executeUpdate();
+            System.out.println("Score updated successfully.");
+
+            // Ask user if they want to update another score
+            System.out.print("Do you want to update another score? (y/n) ");
+            String answer = scanner.nextLine().toLowerCase();
+            keepUpdating = answer.equals("y");
+        }
+
+        // Print updated information for student
+        String selectQuery = "SELECT * FROM enrollments WHERE student_id = ? AND course_id = ?";
+        PreparedStatement selectStatement = connection.prepareStatement(selectQuery);
+        selectStatement.setInt(1, studentId);
+        selectStatement.setInt(2, courseId);
+        ResultSet resultSet = selectStatement.executeQuery();
+        if (resultSet.next()) {
+            int midtermScore = resultSet.getInt("midterm_score");
+            int endtermScore = resultSet.getInt("endterm_score");
+            int homeworksScore = resultSet.getInt("homework_score");
+            int assignmentsScore = resultSet.getInt("assignment_score");
+            int totalScore = midtermScore + endtermScore + homeworksScore + assignmentsScore;
+            double gpa = totalScore / 100.0;
+
+            System.out.println("Student information for course " + courseName + ":");
+            System.out.println("Student name: " + studentName);
+            System.out.println("Midterm score: " + midtermScore);
+            System.out.println("Endterm score: " + endtermScore);
+            System.out.println("Homeworks score: " + homeworksScore);
+            System.out.println("Assignments score: " + assignmentsScore);
+            System.out.println("GPA: " + gpa);
+        } else {
+            System.out.println("No records found for student " + studentName + " in course " + courseName + ".");
+        }
+    }
+
+    private static int getStudentId(Connection connection, String studentName) throws SQLException {
+        String query = "SELECT id FROM students WHERE name = ?";
+        PreparedStatement preparedStatement = connection.prepareStatement(query);
+        preparedStatement.setString(1, studentName);
+        ResultSet resultSet = preparedStatement.executeQuery();
+        if (resultSet.next()) {
+            return resultSet.getInt("id");
+        }
+        return -1;
+    }
+    private static int getCourseId(Connection connection, String courseName) throws SQLException {
+        String query = "SELECT id FROM courses WHERE name = ?";
+        PreparedStatement preparedStatement = connection.prepareStatement(query);
+        preparedStatement.setString(1, courseName);
+        ResultSet resultSet = preparedStatement.executeQuery();
+        if (resultSet.next()) {
+            return resultSet.getInt("id");
+        }
+        return -1;
+    }
+}
