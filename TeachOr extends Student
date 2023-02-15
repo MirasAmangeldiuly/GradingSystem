@@ -1,0 +1,68 @@
+import java.sql.*;
+import java.util.Scanner;
+
+public class TeachOr extends Student {
+    public static void main(String[] args) throws SQLException {
+        Connection connection = Database.getConnection();
+        Scanner scanner = new Scanner(System.in);
+
+        // Get user type
+        System.out.print("Are you a teacher or a student? (t/s) ");
+        String userType = scanner.nextLine().toLowerCase();
+
+        if (userType.equals("t")) {
+            // Teacher functionality 
+        } else if (userType.equals("student")) {
+            // Get student name and ID
+            System.out.print("Enter your name: ");
+            String studentName = scanner.nextLine();
+            int studentId = getStudentId(connection, studentName);
+
+            // Get a list of courses for the student
+            String selectQuery = "SELECT enrollments.course_id, courses.course_name FROM enrollments INNER JOIN courses ON enrollments.course_id = courses.course_id WHERE student_id = ?";
+            PreparedStatement selectStatement = connection.prepareStatement(selectQuery);
+            selectStatement.setInt(1, studentId);
+            ResultSet resultSet = selectStatement.executeQuery();
+
+            // Loop over courses and print student's scores for each one
+            while (resultSet.next()) {
+                int courseId = resultSet.getInt("course_id");
+                String courseName = resultSet.getString("course_name");
+
+                // Get the student's scores for the course
+                String scoresQuery = "SELECT * FROM enrollments WHERE student_id = ? AND course_id = ?";
+                PreparedStatement scoresStatement = connection.prepareStatement(scoresQuery);
+                scoresStatement.setInt(1, studentId);
+                scoresStatement.setInt(2, courseId);
+                ResultSet scoresResult = scoresStatement.executeQuery();
+                if (scoresResult.next()) {
+                    int midtermScore = scoresResult.getInt("midterm_score");
+                    int endtermScore = scoresResult.getInt("endterm_score");
+                    int homeworksScore = scoresResult.getInt("homework_score");
+                    int assignmentsScore = scoresResult.getInt("assignment_score");
+                    double gpa = scoresResult.getDouble("gpa");
+
+                    System.out.println("Student information for course " + courseName + ":");
+                    System.out.println("Student name: " + studentName);
+                    System.out.println("Midterm score: " + midtermScore);
+                    System.out.println("Endterm score: " + endtermScore);
+                    System.out.println("Homeworks score: " + homeworksScore);
+                    System.out.println("Assignments score: " + assignmentsScore);
+                    System.out.println("GPA: " + gpa);
+                } else {
+                    System.out.println("No scores found for course " + courseName);
+                }
+            }
+        }
+    }
+    private static int getStudentId(Connection connection, String studentName) throws SQLException {
+        String query = "SELECT id FROM students WHERE name = ?";
+        PreparedStatement preparedStatement = connection.prepareStatement(query);
+        preparedStatement.setString(1, studentName);
+        ResultSet resultSet = preparedStatement.executeQuery();
+        if (resultSet.next()) {
+            return resultSet.getInt("id");
+        }
+        return -1;
+    }
+}
