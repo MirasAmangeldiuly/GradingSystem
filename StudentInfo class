@@ -1,0 +1,57 @@
+import java.sql.*;
+import java.util.Scanner;
+
+public class StudentInfo extends InfoMa implements InfoMaProvider, StudentInfoProvider{
+    public StudentInfo() {
+
+    }
+
+    public static void main(String[] args) throws SQLException {
+        Connection connection = Database.getConnection();
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter your name: ");
+        studentName = scanner.nextLine();
+
+        String selectQuery = "SELECT enrollments.course_id, courses.name FROM enrollments INNER JOIN courses ON enrollments.course_id = courses.id WHERE student_id = ?";
+        PreparedStatement selectStatement = connection.prepareStatement(selectQuery);
+        selectStatement.setInt(1, getStudentId(connection, studentName));
+        ResultSet resultSet = selectStatement.executeQuery();
+
+        while (resultSet.next()) {
+            int courseId = resultSet.getInt("course_id");
+            courseName = resultSet.getString("name");
+
+            String scoresQuery = "SELECT * FROM enrollments WHERE student_id = ? AND course_id = ?";
+            PreparedStatement scoresStatement = connection.prepareStatement(scoresQuery);
+            scoresStatement.setInt(1, getStudentId(connection, studentName));
+            scoresStatement.setInt(2, courseId);
+            ResultSet scoresResult = scoresStatement.executeQuery();
+            if (scoresResult.next()) {
+                midtermScore = scoresResult.getInt("midterm_score");
+                endtermScore = scoresResult.getInt("endterm_score");
+                homeworksScore = scoresResult.getInt("homework_score");
+                assignmentsScore = scoresResult.getInt("assignment_score");
+                gpa = scoresResult.getDouble("gpa");
+
+                System.out.println("Student information for course " + courseName + ":");
+                System.out.println("Student name: " + studentName);
+                System.out.println("Midterm score: " + midtermScore);
+                System.out.println("Endterm score: " + endtermScore);
+                System.out.println("Homeworks score: " + homeworksScore);
+                System.out.println("Assignments score: " + assignmentsScore);
+                System.out.println("GPA: " + gpa);
+            } else {
+                System.out.println("No scores found for course " + courseName);
+            }
+        }
+    }
+    @Override
+    public void greet() {
+        System.out.println("Student info is shown");
+    }
+
+    @Override
+    public void displayInfo() {
+
+    }
+}
