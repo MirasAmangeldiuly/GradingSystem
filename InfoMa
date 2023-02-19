@@ -1,3 +1,0 @@
-public interface InfoMaProvider {
-    public void displayInfo();
-}
