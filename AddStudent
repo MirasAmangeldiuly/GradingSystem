@@ -1,0 +1,25 @@
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.Scanner;
+
+public class AddStudent extends AddWhat{
+    public static void main(String[] args) throws SQLException {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter student name: ");
+        String name = scanner.nextLine();
+        addStudent(name);
+    }
+    static Connection connection = Database.getConnection();
+    Scanner scanner = new Scanner(System.in);
+
+    String courseName = scanner.nextLine();
+
+    public static void addStudent(String name) throws SQLException {
+        String query = "INSERT INTO students (name) VALUES (?)";
+        PreparedStatement statement = connection.prepareStatement(query);
+        statement.setString(1, name);
+        statement.executeUpdate();
+        System.out.println("Student added successfully");
+    }
+}
