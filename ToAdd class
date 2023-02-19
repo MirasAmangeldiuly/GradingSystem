@@ -1,0 +1,80 @@
+import java.sql.*;
+import java.util.Scanner;
+
+public class ToAdd extends InfoMa implements InfoMaProvider{
+    private Student student;
+    private Course course;
+
+//    public ToAdd(String studentName, String courseName, Student student, Course course) {
+//        super(studentName, courseName);
+//        this.student = student;
+//        this.course = course;
+//    }
+
+
+//    @Override
+//    public void getInfo() {
+//        System.out.println("Student name: " + getStudentName());
+//        System.out.println("Course name: " + getCourseName());
+//        System.out.println("Student information: " + student);
+//    }
+    @Override
+    public String toString() {
+        return super.toString();
+    }
+
+    public static void main(String[] args) throws SQLException{
+        Connection connection = Database.getConnection();
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.print("Enter student name: ");
+        studentName = scanner.nextLine();
+        System.out.print("Enter course name: ");
+        courseName = scanner.nextLine();
+        System.out.print("Enter midterm score: ");
+        midtermScore = scanner.nextInt();
+        System.out.print("Enter endterm score: ");
+        endtermScore = scanner.nextInt();
+        System.out.print("Enter homeworks score: ");
+        homeworksScore = scanner.nextInt();
+        System.out.print("Enter assignments score: ");
+        assignmentsScore = scanner.nextInt();
+        scanner.close();
+
+
+        totalScore = midtermScore + endtermScore + homeworksScore + assignmentsScore;
+        gpa = totalScore / 100.0;
+
+
+        String insertQuery = "INSERT INTO enrollments (student_id, course_id, midterm_score, endterm_score, homework_score, assignment_score, gpa) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        PreparedStatement preparedStatement = connection.prepareStatement(insertQuery);
+        preparedStatement.setInt(1, getStudentId(connection, studentName));
+        preparedStatement.setInt(2, getCourseId(connection, courseName));
+        preparedStatement.setInt(3, midtermScore);
+        preparedStatement.setInt(4, endtermScore);
+        preparedStatement.setInt(5, homeworksScore);
+        preparedStatement.setInt(6, assignmentsScore);
+        preparedStatement.setDouble(7, gpa);
+        preparedStatement.executeUpdate();
+        System.out.println("Student information has been added to the database.");
+        System.out.println("Student name: " + studentName);
+        System.out.println("Course name: " + courseName);
+        System.out.println("Midterm score: " + midtermScore);
+        System.out.println("Endterm score: " + endtermScore);
+        System.out.println("Homeworks score: " + homeworksScore);
+        System.out.println("Assignments score: " + assignmentsScore);
+        System.out.println("GPA: " + gpa);
+
+    }
+
+
+    @Override
+    public void greet() {
+        System.out.println("Student information is added");
+    }
+
+    @Override
+    public void displayInfo() {
+        System.out.println(studentName + "'s " + "gpa " + gpa);
+    }
+}
