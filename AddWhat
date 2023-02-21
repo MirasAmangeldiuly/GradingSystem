@@ -1,5 +1,4 @@
-все работает вообщем
-Харош
+
 import java.sql.*;
 import java.util.Scanner;
 
