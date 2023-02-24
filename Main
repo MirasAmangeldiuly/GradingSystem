@@ -1,12 +1,16 @@
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Main {
 
     public static void main(String[] args) throws SQLException {
+        ArrayList<InfoMa> people = new ArrayList<>();
 
+        people.add(new StudentInfo("Miras", 3.5) {});
 
-        InfoMaProvider infoMaProvider = new StudentInfo();
+        InfoMaProvider infoMaProvider = new ToAdd() {
+        };
 
         Scanner scanner = new Scanner(System.in);
 
@@ -29,10 +33,15 @@ public class Main {
             }
         } else if (userType.equals("student")) {
             StudentInfo.main(new String[]{});
-            infoMaProvider = new StudentInfo();
+            infoMaProvider = new ToAdd();
 
         }
         infoMaProvider.displayInfo();
-
+        printData(people);
+    }
+    public static void printData (Iterable <InfoMa> people) {
+        for (InfoMa person : people) {
+            System.out.println(person.toString() + " earns " + person.displayInfo() + "  ");
+        }
     }
 }
