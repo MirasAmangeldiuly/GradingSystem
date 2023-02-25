@@ -1,0 +1,74 @@
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+public abstract class InfoMa implements InfoMaProvider{
+    private String name;
+    public InfoMa(){
+
+    }
+    public void printDetails(){
+        System.out.println("Info +");
+    }
+
+    public InfoMa(String name, double gpa){
+        setName(name);
+        setGpa(gpa);
+    }
+    public String displayInfo(){
+        return null;
+    }
+    public void setName(String name) {
+        this.name = name;
+    }
+    public String getName() {
+        return name;
+    }
+
+    public static void setGpa(double gpa) {
+        InfoMa.gpa = gpa;
+    }
+
+    public double getGpa(){
+        return gpa;
+    }
+    public static String studentName;
+    public static String courseName;
+    public static int midtermScore;
+    public static int endtermScore;
+    public static int homeworksScore;
+    public static int assignmentsScore;
+    public static int totalScore;
+    public static double gpa;
+
+    @Override
+    public String toString() {
+        return getName() + " ";
+    }
+
+    public static int getStudentId(Connection connection, String name) throws SQLException {
+
+        String query = "SELECT id FROM students WHERE name = ?";
+        PreparedStatement preparedStatement = connection.prepareStatement(query);
+        preparedStatement.setString(1, name);
+        ResultSet resultSet = preparedStatement.executeQuery();
+        if (resultSet.next()) {
+            return resultSet.getInt("id");
+        }
+        return -1;
+    }
+    public static int getCourseId(Connection connection, String name) throws SQLException {
+
+        String query = "SELECT id FROM courses WHERE name = ?";
+        PreparedStatement preparedStatement = connection.prepareStatement(query);
+        preparedStatement.setString(1, name);
+        ResultSet resultSet = preparedStatement.executeQuery();
+        if (resultSet.next()) {
+            return resultSet.getInt("id");
+        }
+        return -1;
+    }
+
+
+}
