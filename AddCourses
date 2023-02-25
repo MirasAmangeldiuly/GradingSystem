@@ -1,0 +1,24 @@
+import java.sql.*;
+import java.util.Scanner;
+public class AddCourses extends AddWhat {
+    public static void main(String[] args) throws SQLException {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter course name: ");
+        String name = scanner.nextLine();
+        addCourse(name);
+    }
+
+    @Override
+    public void sayInfo() {
+        System.out.println("Course is added");
+    }
+
+    static Connection connection = Database.getConnection();
+    public static void addCourse(String name) throws SQLException {
+        String query = "INSERT INTO courses (name) VALUES (?)";
+        PreparedStatement statement = connection.prepareStatement(query);
+        statement.setString(1, name);
+        statement.executeUpdate();
+        System.out.println("Course added successfully");
+    }
+}
