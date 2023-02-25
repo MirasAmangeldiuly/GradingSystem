@@ -1,0 +1,48 @@
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.Scanner;
+
+public class Main {
+
+    public static void main(String[] args) throws SQLException {
+        ArrayList<InfoMa> people = new ArrayList<>();
+
+        people.add(new StudentInfo("Miras", 3.5) {});
+
+        InfoMaProvider infoMaProvider = new ToAdd() {
+        };
+
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.print("Are you a teacher or a student? (teacher/student) ");
+        String userType = scanner.nextLine().toLowerCase();
+
+        if (userType.equals("teacher")) {
+            System.out.println("what to do?");
+            String input = scanner.nextLine();
+
+            if ("add scores".equals(input)) {
+                ToAdd.main(new String[]{});
+            } else if ("change scores".equals(input)) {
+                ToChange.main(new String[]{});
+            } else if("add new".equals(input)){
+                AddWhat.main(new String[]{});
+            }
+            else {
+                System.out.println("Invalid input!");
+            }
+        } else if (userType.equals("student")) {
+            StudentInfo.main(new String[]{});
+        }
+        infoMaProvider = new ToAdd();
+        infoMaProvider.displayInfo();
+        printData(people);
+        StudentInfo studentInfo = new StudentInfo("Miras", 3.6);
+        Printing.printStudentDetails(studentInfo);
+    }
+    public static void printData (Iterable <InfoMa> people) {
+        for (InfoMa infoMa : people) {
+            System.out.println(infoMa.toString() + " have " + infoMa.displayInfo() + "  ");
+        }
+    }
+}
